@@ -1,19 +1,35 @@
-import { Box, Flex, VStack } from "@chakra-ui/react";
+import { Box, HStack } from "@chakra-ui/react";
 import CodeEditor from './components/CodeEditor'
-
+import Output from "./components/Output";
+import { useState } from "react";
 import { languages } from "./db/db";
 
 function App() {
+  const [html, setHtml] = useState(languages[0].template);
+  const [css, setCss] = useState(languages[1].template);
+  const [js, setJs] = useState(languages[2].template);
+
   return (
-    <Flex direction="row" minH={'100vh'} bg={'#0f0a19'} color={'gray.500'} px={6} py={8}>
-      <VStack spacing={4} align="stretch" flex="1">
+    <Box>
+    <HStack spacing={4} align="stretch">
+      <Box width={'100%'}>
         {languages.map((language, index) => (
-          <Box key={index} p={4} m={2} bg={'gray.700'} borderRadius={'md'}>
-            <CodeEditor lang={language.lang} template={language.template} />
+          <Box key={index} p={4} m={2} borderRadius={'md'}>
+            <CodeEditor 
+              lang={language.lang} 
+              template={language.template} 
+              onChange={(value) => {
+                if(language.lang === 'html') setHtml(value);
+                if(language.lang === 'css') setCss(value);
+                if(language.lang === 'javascript') setJs(value);
+              }} 
+            />
           </Box>
         ))}
-      </VStack>
-    </Flex>
+      </Box>
+      <Output html={html} css={css} js={js} />
+    </HStack>
+    </Box>
   );
 }
 
