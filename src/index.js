@@ -6,7 +6,7 @@ import { Provider } from 'react-redux';
 import store from './store';
 import App from './App';
 import AnimationScreen from './misc/AnimationScreen';
-
+ 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
