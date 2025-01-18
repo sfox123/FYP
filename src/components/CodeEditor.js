@@ -20,7 +20,7 @@ export default function CodeEditor({ lang, monaco }) {
     if (lang === 'css') dispatch(setCss(value));
     if (lang === 'js') dispatch(setJs(value));
   };
-
+ 
   // Called once the editor has mounted
   const handleEditorDidMount = (editor) => {
     editorRef.current = editor;
