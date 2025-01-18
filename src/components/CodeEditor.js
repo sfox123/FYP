@@ -4,7 +4,7 @@ import { Editor } from '@monaco-editor/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setHtml, setCss, setJs } from '../redux/codeSlice';
 
-
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { FaHtml5, FaCss3, FaJs } from 'react-icons/fa';
 
 const languageData = {
@@ -26,6 +26,7 @@ const languageData = {
 
 export default function CodeEditor({ lang, monaco }) {
   const [isEditorReady, setIsEditorReady] = useState(false);
+  const [isEditorVisible, setIsEditorVisible] = useState(true);
   const dispatch = useDispatch();
   const editorRef = useRef(null);
 
@@ -74,23 +75,33 @@ export default function CodeEditor({ lang, monaco }) {
 
   const { icon: Icon, color } = languageData[lang] || {};
 
+  const toggleEditorVisibility = () => {
+    setIsEditorVisible(!isEditorVisible);
+  };
   return (
     <Box>
-      <HStack spacing={2} align="center" padding={0.5} bg={color}>
-        {Icon && <Icon />}
-        <Text color={"white"}>{lang.toUpperCase()}</Text>
+      <HStack spacing={2} align="center" padding={0.5} bg={color} justifyContent="space-between">
+        <HStack marginLeft={2} spacing={2} align="center">
+          {Icon && <Icon />}
+          <Text color={"white"}>{lang.toUpperCase()}</Text>
+        </HStack>
+        <Box onClick={toggleEditorVisibility} marginRight={2} cursor="pointer">
+          {isEditorVisible ? <FaChevronUp color="white" /> : <FaChevronDown color="white" />}
+        </Box>
       </HStack>
-      {monaco ? (
-        <Editor
-          height="30vh"
-          theme="vs-dark"
-          defaultLanguage={lang === 'js' ? 'javascript' : lang}
-          value={currentCode}
-          onChange={handleChange}
-          onMount={handleEditorDidMount}
-        />
-      ) : (
-        <Spinner size="xl" />
+      {isEditorVisible && (
+        monaco ? (
+          <Editor
+            height="30vh"
+            theme="vs-dark"
+            defaultLanguage={lang === 'js' ? 'javascript' : lang}
+            value={currentCode}
+            onChange={handleChange}
+            onMount={handleEditorDidMount}
+          />
+        ) : (
+          <Spinner size="xl" />
+        )
       )}
     </Box>
   );
