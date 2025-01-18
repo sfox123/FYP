@@ -36,7 +36,6 @@ export default function InputComponent({ onInputReady }) {
       position="fixed"
       bottom="0"
       width="100%"
-      bg="white"
       p={4}
       boxShadow="md"
     >

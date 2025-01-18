@@ -1,6 +1,6 @@
 // Output.js
 import React, { useRef, useEffect } from "react";
-import { Box } from "@chakra-ui/react";
+import { AspectRatio } from "@chakra-ui/react";
 
 export default function Output({ html, css, js, onOutputReady }) {
   const iframeRef = useRef(null);
@@ -30,13 +30,14 @@ export default function Output({ html, css, js, onOutputReady }) {
   };
 
   return (
-    <Box flex="1" bg="gray.100">
+    <AspectRatio height={"100%"} borderRadius={24} flex="1" bg="">
       <iframe
         ref={iframeRef}
         title="Output Preview"
-        style={{ width: "100%", height: "85vh", border: "none" }}
+        style={{ width: "100%", borderRadius:8, height: "100%", border: "none" }}
         onLoad={handleLoad}
+        allowFullScreen
       />
-    </Box>
+    </AspectRatio>
   );
 }
