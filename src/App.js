@@ -1,11 +1,14 @@
+import React from 'react';
 import { Box, HStack } from '@chakra-ui/react';
 import { useSelector } from 'react-redux';
 import CodeEditor from './components/CodeEditor';
 import Output from './components/Output';
 import InputComponent from './components/Input';
+import { useMonaco } from '@monaco-editor/react';
 
 function App() {
   const { html, css, js } = useSelector((state) => state.code);
+  const monaco = useMonaco();
 
   return (
     <Box p={2} height="100vh">
@@ -15,14 +18,14 @@ function App() {
           {['html', 'css', 'js'].map((lang) => (
             <Box 
               key={lang} 
-              flex="1"      // let each editor grow/shrink
+              flex="1"
               p={4} 
               m={2} 
               borderRadius="md" 
               bg="gray.800"
               overflow="auto"
             >
-              <CodeEditor lang={lang} />
+              <CodeEditor monaco={monaco} lang={lang} />
             </Box>
           ))}
         </Box>
