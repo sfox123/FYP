@@ -34,7 +34,12 @@ export default function Output({ html, css, js, onOutputReady }) {
       <iframe
         ref={iframeRef}
         title="Output Preview"
-        style={{ width: "100%", borderRadius:8, height: "100%", border: "none" }}
+        style={{
+          width: "100%",
+          borderRadius: 8,
+          height: "70%",
+          border: "none",
+        }}
         onLoad={handleLoad}
         allowFullScreen
       />
