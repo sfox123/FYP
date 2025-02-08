@@ -9,54 +9,44 @@ import {
   DrawerBody,
   useDisclosure,
   Image,
-  Grid,
-  GridItem,
-  VStack,
-  HStack,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalCloseButton,
-  ModalBody,
-  Button,
-  Text,
 } from "@chakra-ui/react";
-import { useSelector } from "react-redux";
-import CodeEditor from "./components/CodeEditor";
-import Output from "./components/Output";
-import InputComponent from "./components/Input";
-import { useMonaco } from "@monaco-editor/react";
-import { FaBars, FaExternalLinkAlt, FaFileExport } from "react-icons/fa";
-import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
+import { useSelector, useDispatch } from "react-redux";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import ExportModal from "./components/ExportModal";
+import CustomSidebar from "./components/CustomSidebar";
+import MainLayout from "./components/MainLayout";
+import OutputModal from "./components/OutputModal";
+import { FaBars } from "react-icons/fa";
+import { setModel } from "./redux/codeSlice";
 
 function App() {
-  const { html, css, js } = useSelector((state) => state.code);
-  const monaco = useMonaco();
+  const { model } = useSelector((state) => state.code);
+  const { html, css, js } = useSelector((state) => state.result);
+  const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [viewOrientation, setViewOrientation] = useState("vertical");
-  // State for output pop-out modal
   const [isOutputModalOpen, setIsOutputModalOpen] = useState(false);
-  // State for export modal
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
-  // Function to generate zip file and trigger download
-  // ...existing imports and code...
-  // Function to generate zip file and trigger download
+  // Update Redux model
+  const handleModelChange = (selectedModel) => {
+    dispatch(setModel(selectedModel));
+  };
+
   const handleDownloadZip = async () => {
     const finalHtml = `<!DOCTYPE html>
-  <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Exported Project</title>
-      <link rel="stylesheet" href="styles.css">
-    </head>
-    <body>
-      ${html}
-      <script src="script.js"></script>
-    </body>
-  </html>`;
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Exported Project</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    ${html}
+    <script src="script.js"></script>
+  </body>
+</html>`;
     const zip = new JSZip();
     zip.file("index.html", finalHtml);
     zip.file("styles.css", css);
@@ -65,10 +55,10 @@ function App() {
     saveAs(blob, "export.zip");
     setIsExportModalOpen(false);
   };
-  // ...rest of code...
+
   return (
     <Box p={2} height="100vh">
-      {/* Header with Hamburger and Logo */}
+      {/* Header */}
       <Box display="flex" alignItems="center" mb={4}>
         <IconButton
           icon={<FaBars />}
@@ -85,7 +75,7 @@ function App() {
         />
       </Box>
 
-      {/* Drawer Component with Sidebar */}
+      {/* Sidebar Drawer */}
       <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
         <DrawerOverlay />
         <DrawerContent bg="black">
@@ -94,220 +84,32 @@ function App() {
             <Image src="/logo-white.png" alt="Logo" width="180px" mx="auto" />
           </Box>
           <DrawerBody color="white" pt={0}>
-            <Sidebar backgroundColor="transparent">
-              <Menu backgroundColor="transparent">
-                <MenuItem>Dashboard</MenuItem>
-                <SubMenu label="View">
-                  <MenuItem
-                    onClick={() => {
-                      setViewOrientation("vertical");
-                      onClose();
-                    }}
-                  >
-                    Vertical (Default)
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => {
-                      setViewOrientation("horizontal");
-                      onClose();
-                    }}
-                  >
-                    Horizontal
-                  </MenuItem>
-                </SubMenu>
-                <MenuItem
-                  onClick={() => {
-                    setIsExportModalOpen(true);
-                    onClose();
-                  }}
-                >
-                  <HStack spacing={2}>
-                    <span>Export</span>
-                    <FaFileExport />
-                  </HStack>
-                </MenuItem>
-              </Menu>
-            </Sidebar>
+            <CustomSidebar
+              onClose={onClose}
+              setViewOrientation={setViewOrientation}
+              handleModelChange={handleModelChange}
+              model={model}
+              setIsExportModalOpen={setIsExportModalOpen}
+            />
           </DrawerBody>
         </DrawerContent>
       </Drawer>
 
-      {viewOrientation === "vertical" ? (
-        // Vertical View Layout
-        <Grid
-          templateColumns={["1fr", "1fr 1fr"]}
-          gap={4}
-          height="calc(100vh - 100px)"
-        >
-          <GridItem>
-            <VStack spacing={4} height="100%">
-              {["html", "css", "js"].map((lang) => (
-                <Box
-                  key={lang}
-                  flex="1"
-                  width="100%"
-                  borderRadius="md"
-                  bg="gray.800"
-                  overflow="hidden"
-                >
-                  <CodeEditor monaco={monaco} lang={lang} />
-                </Box>
-              ))}
-            </VStack>
-          </GridItem>
-          <GridItem>
-            <Box
-              bg="gray.800"
-              p={4}
-              borderRadius="md"
-              height="100%"
-              position="relative"
-            >
-              <HStack justify="space-between" mb={2}>
-                <Box color="white" fontWeight="bold">
-                  Output
-                </Box>
-                {/* Pop-out button opens modal */}
-                <IconButton
-                  size="sm"
-                  variant="ghost"
-                  aria-label="Pop Out Output"
-                  icon={<FaExternalLinkAlt color="white" />}
-                  onClick={() => setIsOutputModalOpen(true)}
-                />
-              </HStack>
-              <Output html={html} css={css} js={js} />
-            </Box>
-          </GridItem>
-        </Grid>
-      ) : (
-        // Horizontal View Layout
-        <VStack spacing={4} height="calc(100vh - 100px)" align="stretch">
-          {/* Editors Row */}
-          <HStack spacing={4} flex="none">
-            {["html", "css", "js"].map((lang) => (
-              <Box
-                key={lang}
-                flex="1"
-                borderRadius="md"
-                bg="gray.800"
-                overflow="hidden"
-              >
-                <CodeEditor monaco={monaco} lang={lang} />
-              </Box>
-            ))}
-          </HStack>
-          {/* Output Panel Row */}
-          <Box
-            bg="gray.800"
-            p={4}
-            borderRadius="md"
-            position="relative"
-            flex="1"
-          >
-            <HStack justify="space-between" mb={2}>
-              <Box color="white" fontWeight="bold">
-                Output
-              </Box>
-              <IconButton
-                size="sm"
-                variant="ghost"
-                aria-label="Pop Out Output"
-                icon={<FaExternalLinkAlt color="white" />}
-                onClick={() => setIsOutputModalOpen(true)}
-              />
-            </HStack>
-            <Output html={html} css={css} js={js} />
-          </Box>
-          {/* Input Component Row */}
-          <Box>
-            <InputComponent />
-          </Box>
-        </VStack>
-      )}
+      {/* Main Layout */}
+      <MainLayout viewOrientation={viewOrientation} />
 
-      {/* In vertical view, Input remains at the bottom */}
-      {viewOrientation === "vertical" && <InputComponent />}
-
-      {/* Output Modal Pop-out */}
-      <Modal
+      {/* Output Modal */}
+      <OutputModal
         isOpen={isOutputModalOpen}
         onClose={() => setIsOutputModalOpen(false)}
-        isCentered
-        size="xl"
-      >
-        <ModalOverlay backdropFilter="blur(8px)" />
-        <ModalContent maxW="90vw" maxH="90vh">
-          <ModalCloseButton />
-          <ModalBody p={0}>
-            <Output html={html} css={css} js={js} />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      />
 
       {/* Export Modal */}
-      <Modal
+      <ExportModal
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
-        isCentered
-        size="lg"
-      >
-        <ModalOverlay backdropFilter="blur(8px)" />
-        <ModalContent>
-          <ModalCloseButton />
-          <ModalBody p={4}>
-            <Text fontSize="xl" mb={4} fontWeight="bold">
-              Export Preview
-            </Text>
-            {/* Preview of each file */}
-            <Box mb={4}>
-              <Text fontWeight="bold">index.html</Text>
-              <Box
-                p={2}
-                bg="white"
-                borderRadius="md"
-                maxH="100px"
-                overflowY="auto"
-              >
-                <Text color={"black"} fontSize="sm">
-                  {html}
-                </Text>
-              </Box>
-            </Box>
-            <Box mb={4}>
-              <Text fontWeight="bold">styles.css</Text>
-              <Box
-                p={2}
-                bg="white"
-                borderRadius="md"
-                maxH="100px"
-                overflowY="auto"
-              >
-                <Text color={"black"} fontSize="sm">
-                  {css}
-                </Text>
-              </Box>
-            </Box>
-            <Box mb={4}>
-              <Text fontWeight="bold">script.js</Text>
-              <Box
-                p={2}
-                bg="white"
-                borderRadius="md"
-                maxH="100px"
-                overflowY="auto"
-              >
-                <Text color={"black"} fontSize="sm">
-                  {js}
-                </Text>
-              </Box>
-            </Box>
-            <Button colorScheme="blue" onClick={handleDownloadZip} width="100%">
-              Download Zip
-            </Button>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+        handleDownloadZip={handleDownloadZip}
+      />
     </Box>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useMemo } from "react";
 import {
   Box,
   Spinner,
@@ -10,10 +10,10 @@ import {
   ModalCloseButton,
   ModalBody,
 } from "@chakra-ui/react";
-import { Editor } from "@monaco-editor/react";
+import { Editor, useMonaco } from "@monaco-editor/react";
 import { useDispatch, useSelector } from "react-redux";
-import { setHtml, setCss, setJs } from "../redux/codeSlice";
-import { FaChevronDown, FaChevronUp, FaExternalLinkAlt } from "react-icons/fa";
+import { setHtml, setCss, setJs } from "../redux/resultSlice";
+import { FaExternalLinkAlt } from "react-icons/fa";
 import { FaHtml5, FaCss3, FaJs } from "react-icons/fa";
 
 const languageData = {
@@ -31,17 +31,19 @@ const languageData = {
   },
 };
 
-export default function CodeEditor({ lang, monaco }) {
+export default function CodeEditor({ lang }) {
   const [isEditorReady, setIsEditorReady] = useState(false);
-  // Remove inline toggle if you want the pop-out behavior only
-  // and add state for modal view
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const monaco = useMonaco();
   const dispatch = useDispatch();
   const editorRef = useRef(null);
 
-  const { html, css, js, lineNumbers } = useSelector((state) => state.code);
+  const { html, css, js, lineNumbers } = useSelector((state) => state.result);
   const currentCode = lang === "html" ? html : lang === "css" ? css : js;
-  const currentLineNumbers = lineNumbers[lang] || [];
+  const currentLineNumbers = useMemo(
+    () => lineNumbers[lang] || [],
+    [lineNumbers, lang]
+  );
 
   const handleChange = (value) => {
     if (lang === "html") dispatch(setHtml(value));
