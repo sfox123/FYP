@@ -63,12 +63,13 @@ function App() {
         <IconButton
           icon={<FaBars />}
           onClick={onOpen}
+          color={"white"}
           aria-label="Open Drawer"
           variant="ghost"
           mr={2}
         />
         <Image
-          src="/logo-white.png"
+          src="logo-white.png"
           alt="Logo"
           width="180px"
           display="inline-block"
