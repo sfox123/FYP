@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setInput } from "../redux/codeSlice";
 import { fetchOpenAICode } from "../redux/codeSlice";
 import { fetchGeminiCode } from "../redux/geminiSlice";
+import { fetchCodexModel } from "../redux/codeXSlice";
 import { FaPaperPlane } from "react-icons/fa";
 
 export default function InputComponent({ onInputReady }) {
@@ -19,6 +20,8 @@ export default function InputComponent({ onInputReady }) {
     // Dispatch the proper thunk based on selected model
     if (model === "Gemini-2.0") {
       dispatch(fetchGeminiCode(message));
+    } else if (model === "codex") {
+      dispatch(fetchCodexModel(message));
     } else {
       dispatch(fetchOpenAICode(message));
     }

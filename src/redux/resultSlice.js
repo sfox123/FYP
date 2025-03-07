@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchOpenAICode } from "./codeSlice";
 import { fetchGeminiCode } from "./geminiSlice";
+import { fetchCodexModel } from "./codeXSlice";
 
 const initialState = {
   html: "",
@@ -69,6 +70,24 @@ const resultSlice = createSlice({
       .addCase(fetchGeminiCode.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to call Gemini-2.0 API.";
+      })
+      // Custom Model Thunk
+      .addCase(fetchCodexModel.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCodexModel.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        const { html, css, js, lineNumbers } = action.payload;
+        state.html = html;
+        state.css = css;
+        state.js = js;
+        state.lineNumbers = lineNumbers;
+      })
+      .addCase(fetchCodexModel.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to call custom model API.";
       });
   },
 });

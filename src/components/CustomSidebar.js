@@ -32,8 +32,15 @@ const CustomSidebar = ({
             Horizontal
           </MenuItem>
         </SubMenu>
-        <MenuItem>Engine</MenuItem>
         <SubMenu label="Model">
+          <MenuItem>
+            <Checkbox
+              isChecked={model === "codex"}
+              onChange={() => handleModelChange("codex")}
+            >
+              CodeX
+            </Checkbox>
+          </MenuItem>
           <MenuItem>
             <Checkbox
               isChecked={model === "GPT-4o"}
