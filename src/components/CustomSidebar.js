@@ -2,6 +2,8 @@ import React from "react";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import { Checkbox, HStack } from "@chakra-ui/react";
 import { FaFileExport } from "react-icons/fa";
+import { Button } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 const CustomSidebar = ({
   onClose,
@@ -58,6 +60,44 @@ const CustomSidebar = ({
             </Checkbox>
           </MenuItem>
         </SubMenu>
+        <MenuItem>
+          <Button
+            w="100%"
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "start",
+              background: "transparent",
+              margin: "0",
+              padding: "0",
+            }}
+            as={Link}
+            _hover={{ bg: "blue.500", color: "black" }}
+            to="/editor"
+            onClick={onClose}
+          >
+            Editor Mode
+          </Button>
+        </MenuItem>
+        <MenuItem>
+          <Button
+            w="100%"
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "start",
+              background: "transparent",
+              margin: "0",
+              padding: "0",
+            }}
+            as={Link}
+            _hover={{ bg: "blue.500", color: "black" }}
+            to="/Designer"
+            onClick={onClose}
+          >
+            Designer Mode
+          </Button>
+        </MenuItem>
         <MenuItem
           onClick={() => {
             setIsExportModalOpen(true);

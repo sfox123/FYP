@@ -7,6 +7,7 @@ import {
   DrawerContent,
   DrawerCloseButton,
   DrawerBody,
+  HStack,
   useDisclosure,
   Image,
 } from "@chakra-ui/react";
@@ -29,7 +30,6 @@ function App() {
   const [isOutputModalOpen, setIsOutputModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
-  // Update Redux model
   const handleModelChange = (selectedModel) => {
     dispatch(setModel(selectedModel));
   };
@@ -41,12 +41,13 @@ function App() {
     <meta charset="UTF-8">
     <title>Exported Project</title>
     <link rel="stylesheet" href="styles.css">
-  </head>
+  </head> 
   <body>
     ${html}
     <script src="script.js"></script>
   </body>
 </html>`;
+
     const zip = new JSZip();
     zip.file("index.html", finalHtml);
     zip.file("styles.css", css);
@@ -68,12 +69,9 @@ function App() {
           variant="ghost"
           mr={2}
         />
-        <Image
-          src="logo-white.png"
-          alt="Logo"
-          width="180px"
-          display="inline-block"
-        />
+        <HStack spacing={4}>
+          <Image src="logo-white.png" alt="Logo" width="180px" />
+        </HStack>
       </Box>
 
       {/* Sidebar Drawer */}

@@ -6,11 +6,7 @@ const theme = extendTheme({
     useSystemColorMode: false,
   },
   styles: {
-    global: {
-      "html, body": {
-        bg: "black",
-      },
-    },
+    global: {},
   },
 });
 

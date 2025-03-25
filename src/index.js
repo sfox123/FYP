@@ -7,6 +7,8 @@ import store from "./store";
 import theme from "./theme";
 import "./index.css";
 import App from "./App";
+import LiveEditor from "./components/LiveEditor";
+import Designer from "./components/Designer";
 import AnimationScreen from "./misc/AnimationScreen";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -18,6 +20,8 @@ root.render(
           <Routes>
             <Route path="/" element={<AnimationScreen />} />
             <Route path="/Home" element={<App />} />
+            <Route path="/editor" element={<LiveEditor />} />
+            <Route path="/designer" element={<Designer />} />
           </Routes>
         </Router>
       </ChakraProvider>

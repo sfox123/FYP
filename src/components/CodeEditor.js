@@ -59,27 +59,26 @@ export default function CodeEditor({ lang }) {
   };
 
   useEffect(() => {
-    if (isEditorReady && editorRef.current && monaco) {
-      try {
-        const decorations = currentLineNumbers.map((rangeObj) => {
-          const { startLine, startColumn, endLine, endColumn } = rangeObj;
-          return {
-            range: new monaco.Range(startLine, startColumn, endLine, endColumn),
-            options: {
-              inlineClassName: "highlight-line",
-            },
-          };
-        });
-        editorRef.current.deltaDecorations([], decorations);
-      } catch (error) {
-        console.error(
-          "Error applying decorations:",
-          error.message,
-          error.stack
-        );
-      }
+    if (editorRef.current) {
+      editorRef.current.onMouseMove((e) => {
+        const position = e.target.position;
+        if (position) {
+          const lineNumber = position.lineNumber;
+          const iframeDoc = document.querySelector("iframe").contentDocument;
+
+          const elements = iframeDoc.querySelectorAll(
+            `[data-line="${lineNumber}"]`
+          );
+          iframeDoc
+            .querySelectorAll("*")
+            .forEach((el) => (el.style.outline = ""));
+          elements.forEach((el) => {
+            el.style.outline = "2px solid red";
+          });
+        }
+      });
     }
-  }, [isEditorReady, currentLineNumbers, monaco]);
+  }, [html]);
 
   const { icon: Icon, color } = languageData[lang] || {};
 

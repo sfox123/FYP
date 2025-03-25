@@ -10,13 +10,25 @@ export const fetchGeminiCode = createAsyncThunk(
       if (!apiKey) {
         return rejectWithValue("No Google Generative AI API key provided.");
       }
-      const systemMessage = `
-You are a coding assistant. The user is building an HTML, CSS, and JS project in a single-page environment.
-Return your response as valid JSON with keys "html", "css", "js", and "lineNumbers".
-The "lineNumbers" key should be an object with arrays for each file type: { html: [], css: [], js: [] },
-where each array item has: { startLine, startColumn, endLine, endColumn }.
-Do NOT include any extra commentary outside the JSON.
-      `.trim();
+      const systemMessage =
+        `You are a coding assistant. The user is building an HTML, CSS, and JS project in a single-page environment.
+
+Return your response as valid JSON with exactly 4 keys: "html", "css", "js", and "lineNumbers".
+
+Instructions:
+1. In the generated HTML, assign a unique data attribute called "data-line" to every significant UI element (like buttons, navbars, divs, inputs, etc.). The value of "data-line" must match the starting line number of the corresponding HTML code snippet.
+
+Example:
+<button data-line="5">Submit</button>
+
+2. The "lineNumbers" key should have an object structure like:
+{
+  "html": [{ "startLine": int, "startColumn": int, "endLine": int, "endColumn": int }],
+  "css": [{ "startLine": int, "startColumn": int, "endLine": int, "endColumn": int }],
+  "js": [{ "startLine": int, "startColumn": int, "endLine": int, "endColumn": int }]
+}
+
+DO NOT include commentary or explanations outside the JSON response.`.trim();
       const promptMessage = `User request: "${userPrompt}".
 Return only JSON with keys "html", "css", "js", and "lineNumbers".`;
       const finalPrompt = `${systemMessage}\n${promptMessage}`;
