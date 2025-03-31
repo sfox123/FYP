@@ -8,18 +8,13 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import CodeEditor from "./CodeEditor";
-import Output from "./Output";
 import InputComponent from "./Input";
+import Output from "./Output";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import OutputModal from "./OutputModal";
 
-export default function MainLayout({
-  viewOrientation,
-  monaco,
-  html,
-  css,
-  js,
-  setIsOutputModalOpen,
-}) {
+export default function MainLayout({ viewOrientation }) {
+  const [isOutputModalOpen, setIsOutputModalOpen] = React.useState(false);
   if (viewOrientation === "vertical") {
     return (
       <>
@@ -39,32 +34,42 @@ export default function MainLayout({
                   bg="gray.800"
                   overflow="hidden"
                 >
-                  <CodeEditor monaco={monaco} lang={lang} />
+                  <CodeEditor lang={lang} />
                 </Box>
               ))}
             </VStack>
           </GridItem>
           <GridItem>
-            <Box
-              bg="gray.800"
-              p={4}
-              borderRadius="md"
-              height="100%"
-              position="relative"
-            >
-              <HStack justify="space-between" mb={2}>
-                <Box color="white" fontWeight="bold">
-                  Output
+            <Box p={4} borderRadius="md" height="100%" position="relative">
+              {/* Render inline output only when modal is closed */}
+              {!isOutputModalOpen && (
+                <Box w="100%" h="90%" borderRadius="md" overflow="hidden">
+                  <Output />
                 </Box>
+              )}
+              {/* Position the button so it stays on top */}
+              <HStack
+                padding={2}
+                justify="space-between"
+                mb={2}
+                position="absolute"
+                top={2}
+                right={2}
+                zIndex={2}
+              >
+                <Box color="white" fontWeight="bold"></Box>
                 <IconButton
                   size="sm"
                   variant="ghost"
                   aria-label="Pop Out Output"
-                  icon={<FaExternalLinkAlt color="white" />}
+                  icon={<FaExternalLinkAlt color="black" />}
                   onClick={() => setIsOutputModalOpen(true)}
                 />
               </HStack>
-              <Output html={html} css={css} js={js} />
+              <OutputModal
+                isOpen={isOutputModalOpen}
+                setIsOutputModalOpen={setIsOutputModalOpen}
+              />
             </Box>
           </GridItem>
         </Grid>
@@ -83,15 +88,12 @@ export default function MainLayout({
               bg="gray.800"
               overflow="hidden"
             >
-              <CodeEditor monaco={monaco} lang={lang} />
+              <CodeEditor lang={lang} />
             </Box>
           ))}
         </HStack>
-        <Box bg="gray.800" p={4} borderRadius="md" position="relative" flex="1">
+        <Box bg="white" p={4} borderRadius="md" position="relative" flex="1">
           <HStack justify="space-between" mb={2}>
-            <Box color="white" fontWeight="bold">
-              Output
-            </Box>
             <IconButton
               size="sm"
               variant="ghost"
@@ -100,7 +102,10 @@ export default function MainLayout({
               onClick={() => setIsOutputModalOpen(true)}
             />
           </HStack>
-          <Output html={html} css={css} js={js} />
+          <OutputModal
+            isOpen={isOutputModalOpen}
+            setIsOutputModalOpen={setIsOutputModalOpen}
+          />
         </Box>
         <Box>
           <InputComponent />

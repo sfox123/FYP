@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useMemo } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   Box,
   Spinner,
@@ -17,68 +17,65 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 import { FaHtml5, FaCss3, FaJs } from "react-icons/fa";
 
 const languageData = {
-  html: {
-    icon: FaHtml5,
-    color: "tomato",
-  },
-  css: {
-    icon: FaCss3,
-    color: "blue",
-  },
-  js: {
-    icon: FaJs,
-    color: "#E4CD05",
-  },
+  html: { icon: FaHtml5, color: "tomato" },
+  css: { icon: FaCss3, color: "blue" },
+  js: { icon: FaJs, color: "#E4CD05" },
 };
 
 export default function CodeEditor({ lang }) {
-  const [isEditorReady, setIsEditorReady] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const monaco = useMonaco();
   const dispatch = useDispatch();
   const editorRef = useRef(null);
 
-  const { html, css, js, lineNumbers } = useSelector((state) => state.result);
+  const { html, css, js } = useSelector((state) => state.result);
   const currentCode = lang === "html" ? html : lang === "css" ? css : js;
-  const currentLineNumbers = useMemo(
-    () => lineNumbers[lang] || [],
-    [lineNumbers, lang]
-  );
+
+  // When Redux state changes, update the editor's model without remounting it
+  useEffect(() => {
+    if (editorRef.current) {
+      const model = editorRef.current.getModel();
+      if (model && model.getValue() !== currentCode) {
+        model.setValue(currentCode);
+      }
+    }
+  }, [currentCode]);
 
   const handleChange = (value) => {
     if (lang === "html") dispatch(setHtml(value));
-    if (lang === "css") dispatch(setCss(value));
-    if (lang === "js") dispatch(setJs(value));
+    else if (lang === "css") dispatch(setCss(value));
+    else if (lang === "js") dispatch(setJs(value));
   };
 
   const handleEditorDidMount = (editor) => {
     editorRef.current = editor;
     editor.layout();
     editor.focus();
-    setIsEditorReady(true);
-  };
 
-  useEffect(() => {
-    if (editorRef.current) {
-      editorRef.current.onMouseMove((e) => {
-        const position = e.target.position;
-        if (position) {
-          const lineNumber = position.lineNumber;
-          const iframeDoc = document.querySelector("iframe").contentDocument;
-
-          const elements = iframeDoc.querySelectorAll(
-            `[data-line="${lineNumber}"]`
-          );
+    // Attach the onMouseMove event to highlight corresponding lines in the output iframe.
+    editor.onMouseMove((e) => {
+      const position = e.target.position;
+      if (position) {
+        const lineNumber = position.lineNumber;
+        // Assuming the output iframe is the first <iframe> in the DOM.
+        const iframe = document.querySelector("iframe");
+        if (iframe && iframe.contentDocument) {
+          const iframeDoc = iframe.contentDocument;
+          // Clear previous outlines.
           iframeDoc
             .querySelectorAll("*")
             .forEach((el) => (el.style.outline = ""));
+          // Highlight all elements with a matching data-line attribute.
+          const elements = iframeDoc.querySelectorAll(
+            `[data-line="${lineNumber}"]`
+          );
           elements.forEach((el) => {
             el.style.outline = "2px solid red";
           });
         }
-      });
-    }
-  }, [html]);
+      }
+    });
+  };
 
   const { icon: Icon, color } = languageData[lang] || {};
 
@@ -95,7 +92,6 @@ export default function CodeEditor({ lang }) {
           {Icon && <Icon />}
           <Text color="white">{lang.toUpperCase()}</Text>
         </HStack>
-        {/* Pop-out icon to open modal */}
         <Box
           onClick={() => setIsModalOpen(true)}
           marginRight={2}
@@ -105,7 +101,6 @@ export default function CodeEditor({ lang }) {
         </Box>
       </HStack>
 
-      {/* Inline Editor */}
       {monaco ? (
         <Editor
           height="20vh"
@@ -119,7 +114,6 @@ export default function CodeEditor({ lang }) {
         <Spinner size="xl" />
       )}
 
-      {/* Modal Pop-out */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

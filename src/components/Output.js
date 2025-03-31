@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 import { AspectRatio } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 
-export default function Output({ onOutputReady }) {
+export default function Output() {
   const iframeRef = useRef(null);
   // Retrieve generated code from the centralized result state
   const { html, css, js } = useSelector((state) => state.result);
@@ -30,8 +30,10 @@ export default function Output({ onOutputReady }) {
     }
   }, [html, css, js]);
 
+  // Define handleLoad to handle the iframe load event
   const handleLoad = () => {
-    if (onOutputReady) onOutputReady();
+    console.log("Iframe content loaded.");
+    // Any additional functionality you want to perform after the iframe has loaded
   };
 
   return (
@@ -44,6 +46,7 @@ export default function Output({ onOutputReady }) {
           borderRadius: 8,
           height: "100%",
           border: "none",
+          backgroundColor: "#f0f0f0",
         }}
         onLoad={handleLoad}
         allowFullScreen

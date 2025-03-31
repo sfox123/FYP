@@ -4,8 +4,33 @@ import { fetchGeminiCode } from "./geminiSlice";
 import { fetchCodexModel } from "./codeXSlice";
 
 const initialState = {
-  html: "",
-  css: "",
+  html: `<!Doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Exported Project</title>
+    <link rel="stylesheet" href="styles.css">
+  </head> 
+  <body>
+    <h1>Hello there! 😊</h1>
+  </body>
+</html>`,
+  css: `body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f8ff;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: #4caf50;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}`,
   js: "",
   lineNumbers: { html: [], css: [], js: [] },
   loading: false,

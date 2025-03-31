@@ -69,6 +69,7 @@ const CustomSidebar = ({
               justifyContent: "start",
               background: "transparent",
               margin: "0",
+              color: "white",
               padding: "0",
             }}
             as={Link}
@@ -87,6 +88,7 @@ const CustomSidebar = ({
               flexDirection: "row",
               justifyContent: "start",
               background: "transparent",
+              color: "white",
               margin: "0",
               padding: "0",
             }}

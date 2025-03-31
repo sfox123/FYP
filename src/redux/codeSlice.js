@@ -62,7 +62,8 @@ Return only JSON with keys "html", "css", "js", "lineNumbers".`;
 
       try {
         const parsed = JSON.parse(content);
-        return parsed; // { html, css, js, lineNumbers }
+        console.log("Parsed JSON:", parsed);
+        return parsed;
       } catch (e) {
         return rejectWithValue(
           "Failed to parse JSON from AI response:\n" + content

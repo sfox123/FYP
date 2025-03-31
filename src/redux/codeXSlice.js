@@ -1,16 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { updateResult } from "./resultSlice";
 
-// Async thunk using custom model API
 export const fetchCodexModel = createAsyncThunk(
   "codex/fetchCodexModel",
-  async (userPrompt, { rejectWithValue }) => {
+  async (userPrompt, { rejectWithValue, dispatch }) => {
     try {
       const response = await fetch("http://127.0.0.1:5000/generate", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt: userPrompt }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userPrompt }),
       });
 
       if (!response.ok) {
@@ -19,20 +17,27 @@ export const fetchCodexModel = createAsyncThunk(
       }
 
       const data = await response.json();
-      const { html } = data;
-      return {
-        html,
-        css: "",
-        js: "",
-        lineNumbers: { html: [], css: [], js: [] },
-      };
+
+      if (data.error) {
+        return rejectWithValue(data.error);
+      }
+
+      // Dispatch the result to the resultSlice
+      dispatch(
+        updateResult({
+          html: data.html || "",
+          css: data.css || "",
+          js: data.js || "",
+        })
+      );
+
+      return data;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue("Error: " + error.message);
     }
   }
 );
 
-// This slice is now only used to produce the thunk; no state is kept here.
 const codexSlice = createSlice({
   name: "codex",
   initialState: {},
